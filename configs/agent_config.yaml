@@ -1,0 +1,127 @@
+# Main configuration for the Ethical Hacking AI Agent
+
+# General settings
+agent:
+  name: "Ethical Hacking AI Agent"
+  version: "0.1.0"
+  temp_dir: "./data/temp"
+  max_file_size_mb: 10
+  follow_symlinks: false
+
+# File system traversal
+walker:
+  ignore_patterns:
+    - ".*"           # hidden files/dirs
+    - "__pycache__"
+    - "node_modules"
+    - "vendor"
+    - ".git"
+    - ".svn"
+    - ".hg"
+    - "*.pyc"
+    - "*.pyo"
+    - "*.class"
+    - "*.jar"
+    - "*.war"
+    - "*.zip"
+    - "*.tar.gz"
+    - "*.tgz"
+    - "*.7z"
+    - "*.log"
+    - "*.tmp"
+  include_extensions: null   # null = all extensions
+
+# Parsers (map extension to parser class)
+parsers:
+  .html: "src.parsers.html_parser.HTMLParser"
+  .htm: "src.parsers.html_parser.HTMLParser"
+  .js: "src.parsers.js_parser.JavaScriptParser"
+  .ts: "src.parsers.js_parser.TypeScriptParser"
+  .php: "src.parsers.php_parser.PHPParser"
+  .py: "src.parsers.python_parser.PythonParser"
+  .java: "src.parsers.java_parser.JavaParser"
+  .cs: "src.parsers.csharp_parser.CSharpParser"
+  .rb: "src.parsers.ruby_parser.RubyParser"
+  .go: "src.parsers.go_parser.GoParser"
+  .json: "src.parsers.config_parser.JSONParser"
+  .yaml: "src.parsers.config_parser.YAMLParser"
+  .yml: "src.parsers.config_parser.YAMLParser"
+  .xml: "src.parsers.config_parser.XMLParser"
+  .sql: "src.parsers.sql_parser.SQLParser"
+  .env: "src.parsers.config_parser.EnvParser"
+
+# Detectors configuration (which ones are enabled)
+detectors:
+  enabled:
+    - "injection.sql_injection"
+    - "injection.command_injection"
+    - "xss.reflected_xss"
+    - "xss.stored_xss"
+    - "xss.dom_xss"
+    - "authentication.weak_passwords"
+    - "authentication.session_fixation"
+    - "file_handling.path_traversal"
+    - "crypto.hardcoded_secrets"
+    - "crypto.weak_encryption"
+    - "misconfiguration.missing_headers"
+    - "misconfiguration.debug_code"
+    - "api.graphql_introspection"
+  disabled: []
+  custom_rules_dir: "./knowledge_base/rules"
+
+# Secrets detection
+secrets:
+  patterns_file: "./configs/patterns.yaml"
+  entropy_threshold: 4.5   # Shannon entropy threshold for high-entropy strings
+  min_length: 16
+
+# Dependency analysis
+dependency:
+  enabled: true
+  local_vuln_db: "./src/dependency_analyzer/local_vuln_db.json"
+  package_files:
+    - "package.json"
+    - "package-lock.json"
+    - "requirements.txt"
+    - "Pipfile"
+    - "Pipfile.lock"
+    - "composer.json"
+    - "composer.lock"
+    - "Gemfile"
+    - "Gemfile.lock"
+    - "pom.xml"
+    - "build.gradle"
+
+# Dynamic testing (optional)
+dynamic:
+  enabled: false
+  server:
+    host: "127.0.0.1"
+    port: 8080
+    type: "auto"   # auto, python, php, node
+    root_dir: null   # defaults to target folder
+  scanner:
+    type: "zap"      # zap, custom
+    zap_path: "/usr/local/bin/zap.sh"
+    spider: true
+    ajax_spider: false
+    passive_scan: true
+    active_scan: false
+  payloads_dir: "./src/dynamic_tester/payloads"
+  max_urls: 100
+
+# Reporting
+reporting:
+  output_dir: "./reports"
+  formats: ["html", "json", "markdown"]   # html, pdf, json, markdown
+  templates_dir: "./src/reporting/templates"
+  include_evidence: true
+  executive_summary: true
+  detailed_report: true
+  cvss_version: "3.1"
+
+# Knowledge base
+knowledge_base:
+  cwe_db_path: "./src/knowledge_base/cwe_database.json"
+  cve_cache_dir: "./src/knowledge_base/cve_cache"
+  update_on_start: false   # set to true to update CVE data on start

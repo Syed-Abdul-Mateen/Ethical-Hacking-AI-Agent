@@ -1,0 +1,286 @@
+/* Modern Glassmorphism Dark Theme */
+
+:root {
+    --bg-color: #0f111a;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a5b5;
+    --accent-color: #00ffcc;
+    --accent-hover: #00d9ac;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --card-active: rgba(0, 255, 204, 0.15);
+    --card-active-border: rgba(0, 255, 204, 0.5);
+    --font-family: 'Inter', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Decorative Orbs */
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: -1;
+    opacity: 0.5;
+    animation: float 20s infinite alternate ease-in-out;
+}
+
+.orb-1 {
+    width: 400px;
+    height: 400px;
+    background: #4a00e0;
+    top: -100px;
+    left: -100px;
+}
+
+.orb-2 {
+    width: 500px;
+    height: 500px;
+    background: #00ffcc;
+    bottom: -150px;
+    right: -100px;
+    animation-delay: -5s;
+}
+
+.orb-3 {
+    width: 300px;
+    height: 300px;
+    background: #ff007f;
+    top: 40%;
+    left: 40%;
+    animation-delay: -10s;
+}
+
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(50px, 50px) scale(1.1); }
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    padding: 2rem;
+    z-index: 1;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, #ffffff, #a0a5b5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* Glassmorphic Panel */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 3rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.glass-panel h2 {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Cards Container */
+.cards-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.option-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.option-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.option-card.active {
+    background: var(--card-active);
+    border-color: var(--card-active-border);
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+}
+
+.option-card .icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.option-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.option-card p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* Form Styling */
+.form-group {
+    margin-bottom: 2.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.glass-input {
+    width: 100%;
+    padding: 1.2rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-family: var(--font-family);
+    transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
+}
+
+.glass-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Glow Button */
+.glow-button {
+    width: 100%;
+    padding: 1.2rem;
+    background: var(--accent-color);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+}
+
+.glow-button:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(0, 255, 204, 0.6);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .cards-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .glass-panel {
+        padding: 2rem 1.5rem;
+    }
+}
+/* Additional styles for scan.html */
+.text-center { text-align: center; }
+.status-indicator { margin: 2rem 0; }
+.spinner {
+    width: 60px; height: 60px;
+    border: 5px solid rgba(255,255,255,0.05);
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    margin: 0 auto 1.5rem auto;
+    animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.pulse-text { 
+    animation: pulse 1.5s infinite alternate; 
+    color: var(--text-primary);
+}
+@keyframes pulse { 
+    0% { opacity: 0.7; } 
+    100% { opacity: 1; text-shadow: 0 0 15px var(--accent-color); } 
+}
+.summary-stats {
+    display: flex; justify-content: space-between; gap: 1.5rem; margin-top: 1rem;
+}
+.stat-card {
+    background: rgba(0,0,0,0.2); 
+    border: 1px solid var(--glass-border);
+    border-radius: 16px; 
+    padding: 2rem 1.5rem; 
+    width: 50%;
+    transition: transform 0.3s ease;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+.stat-value {
+    font-size: 3rem; 
+    font-weight: 800; 
+    color: var(--text-primary); 
+    margin-bottom: 0.5rem;
+}
+.stat-value.text-danger { 
+    color: #ff007f; 
+    text-shadow: 0 0 20px rgba(255,0,127,0.6); 
+}
+.stat-label { 
+    color: var(--text-secondary); 
+    font-size: 0.95rem; 
+    text-transform: uppercase; 
+    letter-spacing: 1.5px; 
+    font-weight: 600;
+}

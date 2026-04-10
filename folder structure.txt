@@ -1,0 +1,287 @@
+
+ethical_hacking_ai_agent/
+│
+├── .gitignore                          # Ignore virtual env, logs, temp files, etc.
+├── README.md                            # Project overview, setup, usage
+├── LICENSE                              # MIT / GPL license
+├── requirements.txt                     # Python dependencies (core)
+├── docker-compose.yml                    # Spin up agent + optional test env
+├── .env.example                          # Environment variables template
+├── setup.py                              # For installing as a package
+│
+├── src/
+│   ├── __init__.py
+│   ├── main.py                           # Entry point: parse args, start agent
+│   │
+│   ├── orchestrator/                      # AI brain
+│   │   ├── __init__.py
+│   │   ├── agent.py                        # Main agent class – controls workflow
+│   │   ├── planner.py                       # Decides which detectors to run
+│   │   ├── context.py                        # Holds target folder, findings, config
+│   │   ├── exceptions.py                      # Custom exceptions
+│   │   └── .gitkeep
+│   │
+│   ├── file_system/                         # Traverse and analyse files
+│   │   ├── __init__.py
+│   │   ├── walker.py                          # Recursively walk target folder
+│   │   ├── file_classifier.py                  # Map extensions to parsers
+│   │   ├── ignore_list.py                       # Patterns to skip (optional)
+│   │   └── .gitkeep
+│   │
+│   ├── parsers/                              # Language‑specific code extractors
+│   │   ├── __init__.py
+│   │   ├── base_parser.py                      # Abstract base class
+│   │   ├── html_parser.py                       # Extract scripts, templates
+│   │   ├── js_parser.py                          # JavaScript / TypeScript
+│   │   ├── php_parser.py                          # PHP (tokenizer, regex)
+│   │   ├── python_parser.py                        # Python (ast)
+│   │   ├── java_parser.py                           # Java (simple regex)
+│   │   ├── csharp_parser.py                          # C# / ASP.NET
+│   │   ├── ruby_parser.py                             # Ruby
+│   │   ├── go_parser.py                                # Go
+│   │   ├── config_parser.py                             # JSON, YAML, XML, .env
+│   │   ├── sql_parser.py                                 # SQL files
+│   │   └── .gitkeep
+│   │
+│   ├── detectors/                            # Vulnerability detection modules (SAST)
+│   │   ├── __init__.py
+│   │   ├── base_detector.py                    # Common interface
+│   │   ├── injection/                            # SQL, NoSQL, command, LDAP, XPath
+│   │   │   ├── __init__.py
+│   │   │   ├── sql_injection.py                   # Detect SQLi patterns
+│   │   │   ├── nosql_injection.py                  # MongoDB, etc.
+│   │   │   ├── command_injection.py                 # OS command injection
+│   │   │   ├── ldap_injection.py                     # LDAP injection
+│   │   │   ├── xpath_injection.py                     # XPath injection
+│   │   │   └── .gitkeep
+│   │   ├── xss/                                  # Cross‑site scripting
+│   │   │   ├── __init__.py
+│   │   │   ├── reflected_xss.py                     # Reflected XSS patterns
+│   │   │   ├── stored_xss.py                          # Stored XSS patterns
+│   │   │   ├── dom_xss.py                               # DOM‑based XSS (JS)
+│   │   │   └── .gitkeep
+│   │   ├── authentication/                        # Broken authentication, session
+│   │   │   ├── __init__.py
+│   │   │   ├── weak_passwords.py                      # Hardcoded creds
+│   │   │   ├── session_fixation.py                     # Cookie flags missing
+│   │   │   ├── insecure_auth.py                          # Basic auth over HTTP
+│   │   │   └── .gitkeep
+│   │   ├── access_control/                         # IDOR, privilege escalation
+│   │   │   ├── __init__.py
+│   │   │   ├── idor_patterns.py                        # Detect IDOR in code
+│   │   │   ├── missing_function_level.py                # Admin funcs exposed
+│   │   │   └── .gitkeep
+│   │   ├── file_handling/                           # File upload, path traversal
+│   │   │   ├── __init__.py
+│   │   │   ├── unsafe_file_upload.py                    # No validation
+│   │   │   ├── path_traversal.py                          # Directory traversal
+│   │   │   ├── file_inclusion.py                           # LFI/RFI
+│   │   │   └── .gitkeep
+│   │   ├── crypto/                                   # Weak crypto, hardcoded keys
+│   │   │   ├── __init__.py
+│   │   │   ├── weak_encryption.py                        # MD5, SHA1, etc.
+│   │   │   ├── hardcoded_secrets.py                       # API keys, passwords
+│   │   │   ├── insecure_random.py                          # Predictable random
+│   │   │   └── .gitkeep
+│   │   ├── misconfiguration/                         # Security headers, debug
+│   │   │   ├── __init__.py
+│   │   │   ├── missing_headers.py                         # X‑Frame‑Options, etc.
+│   │   │   ├── debug_code.py                               # Debug endpoints
+│   │   │   ├── default_credentials.py                      # Default logins
+│   │   │   └── .gitkeep
+│   │   ├── api/                                        # API specific flaws
+│   │   │   ├── __init__.py
+│   │   │   ├── graphql_introspection.py                   # Introspection enabled
+│   │   │   ├── openapi_info_leak.py                        # API docs exposed
+│   │   │   ├── rate_limiting.py                             # No rate limiting
+│   │   │   └── .gitkeep
+│   │   ├── business_logic/                             # Custom logic flaws
+│   │   │   ├── __init__.py
+│   │   │   ├── workflow_bypass.py                          # Step skipping
+│   │   │   ├── race_condition.py                             # Potential race
+│   │   │   └── .gitkeep
+│   │   ├── deserialization/                             # Insecure deserialization
+│   │   │   ├── __init__.py
+│   │   │   ├── php_deserialize.py                           # PHP unserialize
+│   │   │   ├── python_pickle.py                              # Pickle usage
+│   │   │   ├── java_serialization.py                          # Java serialisation
+│   │   │   └── .gitkeep
+│   │   ├── dos/                                          # DoS prone patterns
+│   │   │   ├── __init__.py
+│   │   │   ├── regex_dos.py                                  # ReDoS patterns
+│   │   │   ├── large_allocations.py                          # Memory exhaustion
+│   │   │   └── .gitkeep
+│   │   └── .gitkeep
+│   │
+│   ├── secrets_detector/                       # Find sensitive info in code
+│   │   ├── __init__.py
+│   │   ├── detector.py                           # Main class
+│   │   ├── patterns.yaml                          # Regex patterns for keys/tokens
+│   │   ├── high_entropy.py                         # Detect high‑entropy strings
+│   │   └── .gitkeep
+│   │
+│   ├── dependency_analyzer/                      # Vulnerable libraries
+│   │   ├── __init__.py
+│   │   ├── scanner.py                              # Scan package files
+│   │   ├── package_parsers/                          # Parse package.json, composer.lock
+│   │   │   ├── __init__.py
+│   │   │   ├── npm_parser.py
+│   │   │   ├── pip_parser.py
+│   │   │   ├── composer_parser.py
+│   │   │   ├── gem_parser.py
+│   │   │   ├── maven_parser.py
+│   │   │   └── .gitkeep
+│   │   ├── vuln_db_updater.py                       # Fetch CVE data (NVD, etc.)
+│   │   ├── local_vuln_db.json                         # Local cache
+│   │   └── .gitkeep
+│   │
+│   ├── dynamic_tester/                          # Optional: run live tests
+│   │   ├── __init__.py
+│   │   ├── server_launcher.py                      # Start local server (PHP, Python, Node)
+│   │   ├── crawler.py                               # Basic spider
+│   │   ├── scanner.py                               # OWASP ZAP wrapper / custom
+│   │   ├── payloads/                                 # Payloads for dynamic testing
+│   │   │   ├── xss_payloads.txt
+│   │   │   ├── sqli_payloads.txt
+│   │   │   └── .gitkeep
+│   │   └── .gitkeep
+│   │
+│   ├── knowledge_base/                           # Offline vulnerability data
+│   │   ├── __init__.py
+│   │   ├── cwe_database.json                       # CWE descriptions, mitigations
+│   │   ├── cve_cache/                               # Local CVE JSON (optional)
+│   │   ├── rules/                                   # Custom YARA / regex rules
+│   │   │   ├── sql_injection.yara
+│   │   │   ├── xss.yara
+│   │   │   └── .gitkeep
+│   │   ├── updater.py                               # Script to refresh data
+│   │   └── .gitkeep
+│   │
+│   ├── reporting/                                 # Report generation
+│   │   ├── __init__.py
+│   │   ├── generator.py                             # Main report builder
+│   │   ├── templates/                                 # Report templates
+│   │   │   ├── simple_summary.html
+│   │   │   ├── detailed_report.html
+│   │   │   ├── style.css
+│   │   │   └── .gitkeep
+│   │   ├── exporters/                                 # Output formats
+│   │   │   ├── __init__.py
+│   │   │   ├── html_exporter.py
+│   │   │   ├── pdf_exporter.py                        # WeasyPrint / ReportLab
+│   │   │   ├── json_exporter.py
+│   │   │   ├── markdown_exporter.py
+│   │   │   └── .gitkeep
+│   │   ├── evidence/                                 # Store screenshots/dumps
+│   │   │   └── .gitkeep
+│   │   └── .gitkeep
+│   │
+│   ├── utils/                                      # Helpers
+│   │   ├── __init__.py
+│   │   ├── logger.py                                 # Centralised logging
+│   │   ├── config.py                                 # Load config from YAML/env
+│   │   ├── file_utils.py                              # Read/write files safely
+│   │   ├── subprocess_wrapper.py                      # Run external commands
+│   │   ├── deduplicator.py                             # Remove duplicate findings
+│   │   ├── cvss_calculator.py                          # Severity scoring
+│   │   ├── validators.py                               # Input validation
+│   │   └── .gitkeep
+│   │
+│   └── web_ui/                                      # Optional dashboard (Flask)
+│       ├── __init__.py
+│       ├── app.py
+│       ├── static/
+│       │   ├── css/
+│       │   │   └── .gitkeep
+│       │   ├── js/
+│       │   │   └── .gitkeep
+│       │   └── .gitkeep
+│       ├── templates/
+│       │   ├── index.html
+│       │   ├── scan.html
+│       │   └── .gitkeep
+│       ├── forms.py
+│       ├── api/
+│       │   ├── __init__.py
+│       │   ├── routes.py
+│       │   └── .gitkeep
+│       └── .gitkeep
+│
+├── tests/                                         # Unit & integration tests
+│   ├── __init__.py
+│   ├── conftest.py
+│   ├── test_orchestrator/
+│   │   ├── __init__.py
+│   │   └── .gitkeep
+│   ├── test_parsers/
+│   │   ├── __init__.py
+│   │   └── .gitkeep
+│   ├── test_detectors/
+│   │   ├── __init__.py
+│   │   └── .gitkeep
+│   ├── test_utils/
+│   │   ├── __init__.py
+│   │   └── .gitkeep
+│   └── integration/
+│       ├── __init__.py
+│       └── .gitkeep
+│
+├── data/                                          # Runtime data (excluded from git)
+│   ├── scans/                                       # Per‑scan results
+│   │   └── .gitkeep
+│   ├── logs/                                        # Agent logs
+│   │   └── .gitkeep
+│   ├── temp/                                        # Temporary files
+│   │   └── .gitkeep
+│   └── uploads/                                     # Files uploaded during testing
+│       └── .gitkeep
+│
+├── configs/                                        # Configuration files
+│   ├── agent_config.yaml                              # Main agent settings
+│   ├── logging.conf                                   # Logging configuration
+│   ├── detectors_config.yaml                           # Enable/disable detectors
+│   ├── patterns.yaml                                   # Secrets patterns
+│   ├── tool_paths.yaml                                 # Paths to external tools
+│   └── docker/                                         # Docker‑specific configs
+│       └── .gitkeep
+│
+├── scripts/                                         # Utility scripts
+│   ├── setup_environment.sh                            # Install OS dependencies
+│   ├── update_knowledge_base.sh                         # Fetch latest CVE data
+│   ├── run_tests.sh                                     # Run pytest
+│   ├── start_agent.sh                                   # Launch agent
+│   ├── clean.sh                                         # Remove temp files
+│   └── .gitkeep
+│
+├── docs/                                            # Documentation
+│   ├── architecture.md
+│   ├── detectors.md
+│   ├── api_reference.md
+│   ├── user_guide.md
+│   ├── developer_guide.md
+│   └── .gitkeep
+│
+├── docker/                                          # Dockerfiles for each component
+│   ├── agent/
+│   │   ├── Dockerfile
+│   │   └── .gitkeep
+│   ├── target/                                         # Vulnerable test target
+│   │   ├── Dockerfile
+│   │   └── .gitkeep
+│   ├── db/                                             # PostgreSQL for results
+│   │   ├── Dockerfile
+│   │   └── .gitkeep
+│   └── web_ui/
+│       ├── Dockerfile
+│       └── .gitkeep
+│
+└── examples/                                        # Example usage
+    ├── sample_targets/
+    │   ├── dvwa/                                        # Damn Vulnerable Web App
+    │   │   └── .gitkeep
+    │   └── webgoat/
+    │       └── .gitkeep
+    └── scan_profiles/
+        ├── quick_scan.yaml
+        ├── full_audit.yaml
+        └── .gitkeep

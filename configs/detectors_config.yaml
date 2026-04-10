@@ -1,0 +1,32 @@
+# Configuration for vulnerability detectors
+detectors:
+  injection:
+    sql_injection:
+      enabled: true
+      severity_threshold: medium
+    command_injection:
+      enabled: true
+      severity_threshold: high
+    xss:
+      reflected_xss:
+        enabled: true
+      stored_xss:
+        enabled: true
+      dom_xss:
+        enabled: true
+  
+  authentication:
+    weak_passwords:
+      enabled: true
+    session_fixation:
+      enabled: true
+
+  misconfiguration:
+    missing_headers:
+      enabled: true
+    debug_code:
+      enabled: true
+
+  secrets:
+    enabled: true
+    entropy_threshold: 4.5

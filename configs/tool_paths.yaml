@@ -1,0 +1,10 @@
+# Paths to external static/dynamic analysis tools or language runtimes
+tools:
+  python: "/usr/bin/python3"
+  node: "/usr/bin/node"
+  php: "/usr/bin/php"
+  java: "/usr/bin/java"
+  wget: "/usr/bin/wget"
+  curl: "/usr/bin/curl"
+  nmap: "/usr/bin/nmap"
+  zap_shell: "/opt/zaproxy/zap.sh"

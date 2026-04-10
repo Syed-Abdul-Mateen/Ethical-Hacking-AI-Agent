@@ -1,0 +1,40 @@
+{
+  "target": "D:\\Projects\\Ethical Hacking AI Agent\\src",
+  "scan_time": "2026-03-21T03:25:43.650697",
+  "files_scanned": 110,
+  "files_parsed": 102,
+  "total_findings": 0,
+  "findings_by_severity": {
+    "critical": [],
+    "high": [],
+    "medium": [],
+    "low": [],
+    "info": []
+  },
+  "findings": [],
+  "vulnerable_dependencies": [],
+  "secrets_findings": [],
+  "dynamic_findings": [],
+  "errors": [
+    {
+      "component": "WeakPasswordsDetector",
+      "message": "'ParsedFile' object has no attribute 'file_path'"
+    },
+    {
+      "component": "HardcodedSecretsDetector",
+      "message": "Can't instantiate abstract class HardcodedSecretsDetector without an implementation for abstract method 'run'"
+    },
+    {
+      "component": "WeakEncryptionDetector",
+      "message": "'ParsedFile' object has no attribute 'file_path'"
+    },
+    {
+      "component": "MissingHeadersDetector",
+      "message": "'ParsedFile' object has no attribute 'file_path'"
+    },
+    {
+      "component": "DebugCodeDetector",
+      "message": "'ParsedFile' object has no attribute 'file_path'"
+    }
+  ]
+}

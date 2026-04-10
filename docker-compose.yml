@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  db:
+    build:
+      context: ./docker/db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: agent_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - agent_network
+
+  agent:
+    build:
+      context: .
+      dockerfile: docker/agent/Dockerfile
+    environment:
+      - DB_HOST=db
+      - DB_USER=admin
+      - DB_PASSWORD=password
+      - DB_NAME=agent_db
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    networks:
+      - agent_network
+
+  web_ui:
+    build:
+      context: .
+      dockerfile: docker/web_ui/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=admin
+      - DB_PASSWORD=password
+      - DB_NAME=agent_db
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    networks:
+      - agent_network
+
+  target:
+    build:
+      context: ./docker/target
+    ports:
+      - "8080:80"
+    networks:
+      - agent_network
+
+networks:
+  agent_network:
+    driver: bridge
+
+volumes:
+  db_data:

@@ -1,0 +1,52 @@
+{
+  "target": "D:\\Projects\\Ethical Hacking AI Agent\\src",
+  "scan_time": "2026-03-21T03:11:12.721408",
+  "files_scanned": 110,
+  "files_parsed": 102,
+  "total_findings": 0,
+  "findings_by_severity": {
+    "critical": [],
+    "high": [],
+    "medium": [],
+    "low": [],
+    "info": []
+  },
+  "findings": [],
+  "vulnerable_dependencies": [],
+  "secrets_findings": [],
+  "dynamic_findings": [],
+  "errors": [
+    {
+      "component": "CommandInjectionDetector",
+      "message": "'dict' object has no attribute 'parsed_files'"
+    },
+    {
+      "component": "WeakPasswordsDetector",
+      "message": "'dict' object has no attribute 'parsed_files'"
+    },
+    {
+      "component": "SessionFixationDetector",
+      "message": "'dict' object has no attribute 'parsed_files'"
+    },
+    {
+      "component": "PathTraversalDetector",
+      "message": "'dict' object has no attribute 'parsed_files'"
+    },
+    {
+      "component": "HardcodedSecretsDetector",
+      "message": "Can't instantiate abstract class HardcodedSecretsDetector without an implementation for abstract method 'run'"
+    },
+    {
+      "component": "WeakEncryptionDetector",
+      "message": "'dict' object has no attribute 'parsed_files'"
+    },
+    {
+      "component": "MissingHeadersDetector",
+      "message": "'dict' object has no attribute 'parsed_files'"
+    },
+    {
+      "component": "DebugCodeDetector",
+      "message": "'dict' object has no attribute 'parsed_files'"
+    }
+  ]
+}

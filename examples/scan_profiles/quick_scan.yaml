@@ -1,0 +1,14 @@
+profile_name: "Quick Scan"
+description: "A fast, high-level scan focusing on major SAST issues and secrets."
+modes:
+  sast: true
+  dast: false
+  sca: false
+enabled_detectors:
+  - "sql_injection"
+  - "xss"
+  - "secrets"
+  - "command_injection"
+timeouts:
+  file_parse_sec: 10
+  scan_total_sec: 600

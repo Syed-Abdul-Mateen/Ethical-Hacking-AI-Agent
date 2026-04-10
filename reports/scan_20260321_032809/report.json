@@ -1,0 +1,36 @@
+{
+  "target": "D:\\Projects\\Ethical Hacking AI Agent\\src",
+  "scan_time": "2026-03-21T03:28:09.346170",
+  "files_scanned": 110,
+  "files_parsed": 102,
+  "total_findings": 0,
+  "findings_by_severity": {
+    "critical": [],
+    "high": [],
+    "medium": [],
+    "low": [],
+    "info": []
+  },
+  "findings": [],
+  "vulnerable_dependencies": [],
+  "secrets_findings": [],
+  "dynamic_findings": [],
+  "errors": [
+    {
+      "component": "WeakPasswordsDetector",
+      "message": "Finding.__init__() got an unexpected keyword argument 'line_number'"
+    },
+    {
+      "component": "WeakEncryptionDetector",
+      "message": "Finding.__init__() got an unexpected keyword argument 'line_number'"
+    },
+    {
+      "component": "MissingHeadersDetector",
+      "message": "Finding.__init__() got an unexpected keyword argument 'line_number'"
+    },
+    {
+      "component": "DebugCodeDetector",
+      "message": "Finding.__init__() got an unexpected keyword argument 'line_number'"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+profile_name: "Full Audit"
+description: "Comprehensive scan running SAST, DAST, SCA, and all available detectors."
+modes:
+  sast: true
+  dast: true
+  sca: true
+enabled_detectors:
+  - "ALL"
+timeouts:
+  file_parse_sec: 60
+  scan_total_sec: 3600
+dynamic:
+  max_crawl_depth: 5
+  fuzzing: true

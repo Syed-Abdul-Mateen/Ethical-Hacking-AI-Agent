@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan Status - Ethical Hacking AI Agent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark_theme.css') }}">
+    {% if status == 'pending' %}
+    <meta http-equiv="refresh" content="3">
+    {% endif %}
+</head>
+<body>
+    <!-- Background decorative orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="container">
+        <header>
+            <h1>Scan Status</h1>
+            <p style="font-family: monospace; color: var(--text-secondary);">ID: {{ scan_id }}</p>
+        </header>
+
+        <div class="glass-panel text-center">
+            {% if status == 'pending' %}
+                <div class="status-indicator">
+                    <div class="spinner"></div>
+                    <h2 class="pulse-text">Scan in progress...</h2>
+                    <p style="color: var(--text-secondary); margin-top: 1rem;">Please wait. Initiating attack sequence and analyzing payloads.</p>
+                </div>
+            {% else %}
+                <div class="status-indicator complete">
+                    <h2 style="color: var(--accent-color); margin-bottom: 2rem; font-size: 2rem; text-shadow: 0 0 15px rgba(0, 255, 204, 0.4);">Scan Completed</h2>
+                </div>
+                <div class="summary-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ summary.files_scanned }}</div>
+                        <div class="stat-label">Files Scanned</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value text-danger">{{ summary.findings_count }}</div>
+                        <div class="stat-label">Vulnerabilities</div>
+                    </div>
+                </div>
+                {% if report_path %}
+                <div style="margin-top: 2rem; margin-bottom: 1.5rem; text-align: left; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px; border: 1px solid var(--glass-border);">
+                    <p style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">Report successfully generated at:</p>
+                    <code style="color: #00ffcc; word-break: break-all; font-size: 0.85rem;">{{ report_path }}</code>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.9rem;">(Open this HTML file in your browser to view the beautiful detailed report dashboard)</p>
+                </div>
+                {% endif %}
+            {% endif %}
+            
+            <div style="margin-top: 2.5rem;">
+                <a href="{{ url_for('index') }}" class="glow-button" style="text-decoration: none; display: inline-block; width: 100%; box-sizing: border-box;">{% if status == 'pending' %}Cancel / Go Back{% else %}Run Another Scan{% endif %}</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethical Hacking AI Agent</title>
+    <!-- Import Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark_theme.css') }}">
+</head>
+<body>
+    <!-- Background decorative orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="container">
+        <header>
+            <h1>Ethical Hacking AI Agent</h1>
+            <p>Automated static and dynamic security scanning.</p>
+        </header>
+
+        <!-- The Glassmorphic form container -->
+        <div class="glass-panel">
+            <h2>Select Attack Vector</h2>
+            <form method="POST" action="{{ url_for('scan') }}" id="scanForm">
+                {{ form.hidden_tag() }}
+                
+                <!-- Hidden scan type field -->
+                {{ form.scan_type(id="scan_type_hidden", style="display:none;") }}
+
+                <!-- Selection Cards -->
+                <div class="cards-container">
+                    <div class="option-card active" id="card-local" onclick="selectMode('local')">
+                        <div class="icon">📁</div>
+                        <h3>Local Folder</h3>
+                        <p>Perform a deep SAST audit on local source code.</p>
+                    </div>
+                    <div class="option-card" id="card-url" onclick="selectMode('url')">
+                        <div class="icon">🌐</div>
+                        <h3>Website URL</h3>
+                        <p>Spider a URL and perform live dynamic attacks.</p>
+                    </div>
+                </div>
+
+                <!-- Input Field -->
+                <div class="form-group">
+                    {{ form.target.label(id="target_label") }}
+                    {{ form.target(class="glass-input", id="target_input", placeholder="Enter absolute path (e.g. C:\\Projects\\App)") }}
+                </div>
+
+                <!-- Hidden Dynamic toggle (always true) -->
+                <div style="display: none;">
+                    {{ form.dynamic(checked=True) }}
+                </div>
+
+                <button type="submit" class="glow-button">Initiate Attack Sequence</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function selectMode(mode) {
+            // Update hidden select field
+            document.getElementById('scan_type_hidden').value = mode;
+            
+            // Update active card styling
+            document.getElementById('card-local').classList.remove('active');
+            document.getElementById('card-url').classList.remove('active');
+            document.getElementById('card-' + mode).classList.add('active');
+            
+            // Update label and placeholder
+            const label = document.getElementById('target_label');
+            const input = document.getElementById('target_input');
+            
+            if (mode === 'local') {
+                label.innerText = 'Target Folder';
+                input.placeholder = 'Enter absolute path (e.g. C:\\Projects\\App)';
+            } else {
+                label.innerText = 'Target URL';
+                input.placeholder = 'Enter website URL (e.g. https://example.com)';
+            }
+        }
+    </script>
+</body>
+</html>
