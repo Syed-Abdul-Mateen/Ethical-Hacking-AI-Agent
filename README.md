@@ -7,7 +7,7 @@
 
 ## Abstract
 
-The Ethical Hacking AI Agent is an advanced, autonomous Security Operation Center (SOC) and Dynamic Application Security Testing (DAST) framework. Engineered to orchestrate complex vulnerability assessments, the platform automates the entire threat lifecycle—from reconnaissance and payload injection to AI-driven vulnerability analysis and remediation generation. 
+The Ethical Hacking AI Agent is an advanced, autonomous Security Operation Center (SOC) and Dynamic Application Security Testing (DAST) framework. Engineered to orchestrate complex vulnerability assessments, the platform automates the entire threat lifecycle, from reconnaissance and payload injection to AI-driven vulnerability analysis and remediation generation. 
 
 Designed for seamless integration into modern DevSecOps pipelines, the system leverages an asynchronous execution engine and real-time telemetry streaming to deliver high-fidelity security intelligence with minimal latency.
 

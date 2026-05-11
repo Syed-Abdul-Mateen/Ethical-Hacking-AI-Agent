@@ -61,7 +61,7 @@ export default function Dashboard() {
   // WebSocket connection
   useEffect(() => {
     const s = io(API_BASE, { transports: ["websocket", "polling"] });
-    s.on("connect", () => console.log("✅ WebSocket connected"));
+    s.on("connect", () => console.log("WebSocket connected successfully"));
     s.on("connect_error", (e) => console.error("WebSocket error:", e));
 
     s.on("scan_log", (data) => {
@@ -160,7 +160,7 @@ export default function Dashboard() {
 
       <div className="max-w-7xl mx-auto p-6 md:p-10 relative z-10">
 
-        {/* ── Header ── */}
+        {/* Header */}
         <header className="mb-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
@@ -204,10 +204,10 @@ export default function Dashboard() {
           </div>
         </header>
 
-        {/* ── Main Grid ── */}
+        {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          {/* ── Left: Mission Control + Terminal ── */}
+          {/* Left: Mission Control + Terminal */}
           <div className="lg:col-span-2 space-y-6">
 
             {/* Mission Control Progress */}
@@ -241,7 +241,7 @@ export default function Dashboard() {
             {/* Live Terminal */}
             <LiveTerminal logs={logs} />
 
-            {/* ── Findings Table (shown after scan) ── */}
+            {/* Findings Table (shown after scan) */}
             {findings.length > 0 && (
               <div className="glass-panel border border-red-500/10 rounded-2xl overflow-hidden">
                 <div className="p-4 border-b border-white/5 flex items-center gap-2">
@@ -291,7 +291,7 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* ── Right: Stats Sidebar ── */}
+          {/* Right: Stats Sidebar */}
           <div className="space-y-5">
 
             {/* Threat Profile */}
