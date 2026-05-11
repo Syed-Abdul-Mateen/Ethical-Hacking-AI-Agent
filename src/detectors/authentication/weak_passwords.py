@@ -1,9 +1,11 @@
+from pathlib import Path
 """
 Detector for hardcoded weak passwords.
 """
 
 import re
-from typing import List
+from src.parsers.base_parser import ParsedFile
+from typing import List, Dict, Any, Optional
 
 from src.detectors.base_detector import BaseDetector, Finding
 from src.orchestrator.context import ScanContext
@@ -31,7 +33,7 @@ class WeakPasswordsDetector(BaseDetector):
     "switch", "firewall", "adminadmin123", "password123", "welcome2023", "admin2023", "pass@123"
     ]
 
-    def run(self, parsed_data: dict) -> list:
+    def run(self, parsed_data: Dict[Path, ParsedFile]) -> List[Finding]:
         findings = []
         for _, parsed_file in parsed_data.items():
             content = parsed_file.content

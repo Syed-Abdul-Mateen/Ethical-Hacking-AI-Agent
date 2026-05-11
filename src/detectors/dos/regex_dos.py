@@ -1,9 +1,11 @@
+from pathlib import Path
 """
 Detector for ReDoS (Regular Expression Denial of Service).
 """
 
 import re
-from typing import List
+from src.parsers.base_parser import ParsedFile
+from typing import List, Dict, Any, Optional
 
 from src.detectors.base_detector import BaseDetector, Finding
 from src.orchestrator.context import ScanContext
@@ -15,13 +17,13 @@ logger = get_logger(__name__)
 class ReDoSDetector(BaseDetector):
     """Detects regex patterns vulnerable to catastrophic backtracking."""
 
-    def run(self, parsed_data: dict) -> list:
+    def run(self, parsed_data: Dict[Path, ParsedFile]) -> List[Finding]:
         findings = []
         for _, parsed_file in parsed_data.items():
             content = parsed_file.content
             # Look for regex patterns that might be vulnerable
             # Simplified: patterns with nested quantifiers like (a+)+
-            pattern = re.compile(r'[^\\]\('[^)]*\+[^)]*\+', re.IGNORECASE)
+            pattern = re.compile(r'\([^)]+\+\)\+', re.IGNORECASE)
             for match in pattern.finditer(content):
                 # Extract the regex pattern if possible
                 line = content[: match.start()].count("\n") + 1

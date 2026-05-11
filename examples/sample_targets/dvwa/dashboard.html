@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head><title>Dashboard</title></head>
+<body>
+<!-- VULNERABLE: Inline script with user data -->
+<script>
+    var user = "<%= username %>";
+    document.getElementById('greeting').innerHTML = "Hello " + user;
+    
+    // VULNERABLE: DOM XSS via URL fragment
+    var data = document.location.hash.substring(1);
+    document.getElementById('content').innerHTML = data;
+    
+    // VULNERABLE: eval usage
+    var config = eval('(' + window.name + ')');
+</script>
+
+<!-- VULNERABLE: Form without CSRF token -->
+<form action="/transfer" method="POST">
+    <input name="amount" type="text">
+    <input name="to_account" type="text">
+    <button>Transfer Money</button>
+</form>
+
+<!-- VULNERABLE: Hidden admin link -->
+<a href="/admin?debug=true&token=abc123">Admin Panel</a>
+</body>
+</html>

@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0f;
+  --foreground: #ffffff;
+  --accent: #10b981;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --radius: 0.75rem;
+}
+
+html, body {
+  background-color: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+/* ── Glassmorphism Panel ───────────────────────────────── */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+}
+
+/* ── Terminal Font ─────────────────────────────────────── */
+.terminal-text {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+/* ── Custom Scrollbar ──────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(16,185,129,0.3); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(16,185,129,0.6); }
+
+/* ── Glow Animation ────────────────────────────────────── */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(16,185,129,0.3); }
+  50%       { box-shadow: 0 0 20px rgba(16,185,129,0.6); }
+}
+.animate-glow { animation: pulse-glow 2s ease-in-out infinite; }

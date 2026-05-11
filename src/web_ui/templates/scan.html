@@ -3,60 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scan Status - Ethical Hacking AI Agent</title>
+    <title>Mission Control - Ethical Hacking AI Agent</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dark_theme.css') }}">
-    {% if status == 'pending' %}
-    <meta http-equiv="refresh" content="3">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% if refresh %}
+    <meta http-equiv="refresh" content="2">
     {% endif %}
 </head>
-<body>
-    <!-- Background decorative orbs -->
+<body style="padding: 2rem; overflow-x: hidden;">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-
-    <div class="container">
+    
+    <div class="container" style="max-width: 1000px;">
         <header>
-            <h1>Scan Status</h1>
-            <p style="font-family: monospace; color: var(--text-secondary);">ID: {{ scan_id }}</p>
+            <h1>Mission Control</h1>
+            <p>Operation: {{ scan_id[:8] }} | Global Intelligence Grid</p>
         </header>
 
-        <div class="glass-panel text-center">
+        <div class="glass-panel" style="text-align: center; min-height: 400px; display: flex; flex-direction: column; justify-content: center;">
             {% if status == 'pending' %}
-                <div class="status-indicator">
-                    <div class="spinner"></div>
-                    <h2 class="pulse-text">Scan in progress...</h2>
-                    <p style="color: var(--text-secondary); margin-top: 1rem;">Please wait. Initiating attack sequence and analyzing payloads.</p>
+                <div style="margin-bottom: 2rem;">
+                    <div style="font-size: 0.8rem; color: var(--accent-color); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 1rem;">Current Phase: {{ live_status.phase }}</div>
+                    <h2 class="pulse-text" style="font-size: 2.5rem; margin-bottom: 1.5rem;">{{ live_status.message }}</h2>
+                    
+                    <!-- Cinematic Progress Bar -->
+                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="width: {{ live_status.progress }}%; height: 100%; background: linear-gradient(90deg, #4a00e0, #00ffcc); box-shadow: 0 0 15px var(--accent-color); transition: width 1s ease-in-out;"></div>
+                    </div>
+                    <div style="margin-top: 0.5rem; text-align: right; color: var(--text-secondary); font-size: 0.8rem; font-family: monospace;">{{ live_status.progress }}% COMPLETE</div>
                 </div>
+
+                <!-- Full Page Terminal -->
+                <div style="flex-grow: 1; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.5rem; text-align: left; font-family: monospace; overflow: hidden; position: relative;">
+                    <div style="position: absolute; top: 10px; right: 15px; color: var(--accent-color); font-size: 0.7rem; opacity: 0.5;">LIVE TELEMETRY</div>
+                    <div style="color: #00ffcc; font-size: 0.9rem; line-height: 1.6;">
+                        <div style="opacity: 0.4;">> Initializing Secure Protocol...</div>
+                        <div style="opacity: 0.6;">> Bypassing sandboxes...</div>
+                        <div style="opacity: 0.8;">> Mapping dependencies...</div>
+                        <div style="color: #fff;">> {{ live_status.message }}</div>
+                        <div style="margin-top: 10px; animation: blink 1s infinite;">_</div>
+                    </div>
+                </div>
+                
+                <style>
+                    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+                </style>
+
             {% else %}
-                <div class="status-indicator complete">
-                    <h2 style="color: var(--accent-color); margin-bottom: 2rem; font-size: 2rem; text-shadow: 0 0 15px rgba(0, 255, 204, 0.4);">Scan Completed</h2>
+                <div class="status-indicator">
+                    <div style="font-size: 4rem; color: var(--accent-color); margin-bottom: 1rem;">✓</div>
+                    <h2 style="color: var(--accent-color); margin-bottom: 2rem; font-size: 2rem;">Mission Accomplished</h2>
                 </div>
-                <div class="summary-stats">
+
+                <div class="summary-stats" style="margin-bottom: 2rem;">
                     <div class="stat-card">
-                        <div class="stat-value">{{ summary.files_scanned }}</div>
-                        <div class="stat-label">Files Scanned</div>
+                        <div class="stat-value">{{ summary.findings_count }}</div>
+                        <div class="stat-label">Threats Detected</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value text-danger">{{ summary.findings_count }}</div>
-                        <div class="stat-label">Vulnerabilities</div>
+                        <div class="stat-value text-danger" style="color: #ff007f;">{{ summary.critical_count }}</div>
+                        <div class="stat-label">Critical Risks</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: #00ffcc;">{{ summary.files_scanned }}</div>
+                        <div class="stat-label">Files Audited</div>
                     </div>
                 </div>
-                {% if report_path %}
-                <div style="margin-top: 2rem; margin-bottom: 1.5rem; text-align: left; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px; border: 1px solid var(--glass-border);">
-                    <p style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">Report successfully generated at:</p>
-                    <code style="color: #00ffcc; word-break: break-all; font-size: 0.85rem;">{{ report_path }}</code>
-                    <p style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.9rem;">(Open this HTML file in your browser to view the beautiful detailed report dashboard)</p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; text-align: left;">
+                    <!-- Risk Chart -->
+                    <div class="glass-panel" style="padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 16px;">
+                        <h3 style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase;">Risk Topology</h3>
+                        <canvas id="riskChart" style="max-height: 200px;"></canvas>
+                    </div>
+                    
+                    <!-- Export Actions -->
+                    <div class="glass-panel" style="padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 16px; display: flex; flex-direction: column; justify-content: center; gap: 1rem;">
+                        <h3 style="margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase;">Exfiltrate Intelligence</h3>
+                        <a href="/download/{{ scan_id }}/pdf" class="glow-button" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; background: #ff007f; font-size: 0.9rem;">
+                            📄 Download PDF Report
+                        </a>
+                        <a href="/download/{{ scan_id }}/sarif" class="glow-button" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; background: #0066ff; font-size: 0.9rem;">
+                            🛠️ Export SARIF (CI/CD)
+                        </a>
+                    </div>
                 </div>
-                {% endif %}
+
+                <!-- Finding Explorer -->
+                <div style="text-align: left;">
+                    <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Threat Intelligence Explorer</h3>
+                    <div style="background: rgba(0,0,0,0.3); border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border);">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                            <thead style="background: rgba(255,255,255,0.05); color: var(--text-secondary);">
+                                <tr>
+                                    <th style="padding: 1rem;">Vulnerability</th>
+                                    <th style="padding: 1rem;">Severity</th>
+                                    <th style="padding: 1rem;">Remediation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if summary.findings %}
+                                    {% for finding in summary.findings[:5] %}
+                                    <tr style="border-bottom: 1px solid var(--glass-border);">
+                                        <td style="padding: 1rem;">
+                                            <div style="color: var(--text-primary); font-weight: 600;">{{ finding.title }}</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-secondary);">{{ finding.file_path.split('\\')[-1] }}</div>
+                                        </td>
+                                        <td style="padding: 1rem;">
+                                            <span style="padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; background: {% if finding.severity == 'critical' %}#ff007f{% elif finding.severity == 'high' %}#ff4d4d{% else %}#ffcc00{% endif %}; color: #000;">
+                                                {{ finding.severity.upper() }}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 1rem;">
+                                            <button onclick="alert('AI REMEDIATION PLAN:\n\n{{ finding.description }}\n\nFIX:\n{{ finding.remediation }}')" style="background: none; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">
+                                                View Fix
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr><td colspan="3" style="padding: 2rem; text-align: center; color: var(--text-secondary);">No threats detected. Perimeter secure.</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2.5rem;">
+                    <a href="{{ url_for('index') }}" class="glow-button" style="text-decoration: none; display: inline-block; width: 100%; box-sizing: border-box;">New Mission</a>
+                </div>
+
+                <script>
+                    const ctx = document.getElementById('riskChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Critical', 'High', 'Other'],
+                            datasets: [{
+                                data: [{{ summary.critical_count }}, {{ summary.high_count }}, {{ summary.findings_count - summary.critical_count - summary.high_count }}],
+                                backgroundColor: ['#ff007f', '#ff4d4d', '#00ffcc'],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { position: 'right', labels: { color: '#a0a5b5', font: { size: 10 } } } }
+                        }
+                    });
+                </script>
             {% endif %}
-            
-            <div style="margin-top: 2.5rem;">
-                <a href="{{ url_for('index') }}" class="glow-button" style="text-decoration: none; display: inline-block; width: 100%; box-sizing: border-box;">{% if status == 'pending' %}Cancel / Go Back{% else %}Run Another Scan{% endif %}</a>
-            </div>
         </div>
     </div>
 </body>

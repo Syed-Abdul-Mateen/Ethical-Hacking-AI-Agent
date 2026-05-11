@@ -1,5 +1,6 @@
 """Holds all data and state for a single scan."""
 
+import threading
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Dict, Any, Optional
@@ -21,6 +22,12 @@ class ScanContext:
     # Output
     output_dir: Optional[Path] = None
     report_paths: Dict[str, Path] = field(default_factory=dict)
+    original_target: Optional[str] = None
+
+    @property
+    def files_scanned_count(self) -> int:
+        """Return the number of files scanned."""
+        return len(self.files_scanned)
 
     # Scan data
     files_scanned: List[Path] = field(default_factory=list)
@@ -45,6 +52,15 @@ class ScanContext:
     # Temporary directory for this scan
     temp_dir: Optional[Path] = None
 
+    # Threading lock for safe updates
+    _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
+
     def add_error(self, component: str, message: str) -> None:
         """Record an error that occurred during the scan."""
-        self.errors.append({"component": component, "message": message})
+        with self._lock:
+            self.errors.append({"component": component, "message": message})
+
+    def add_finding(self, finding: Any) -> None:
+        """Add a finding in a thread-safe manner."""
+        with self._lock:
+            self.findings.append(finding)

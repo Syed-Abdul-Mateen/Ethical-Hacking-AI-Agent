@@ -42,8 +42,9 @@ class JavaScriptParser(BaseParser):
 
             # Simple recursive walker for AST
             def walk(node):
-                if node is None:
+                if node is None or not hasattr(node, "type"):
                     return
+                
                 if node.type == "ImportDeclaration":
                     metadata["imports"].append(node.source.value)
                 elif node.type == "ExportNamedDeclaration" and node.source:
@@ -57,13 +58,18 @@ class JavaScriptParser(BaseParser):
                             metadata["dangerous_functions"].append(name)
                         elif name in ("fetch", "XMLHttpRequest", "axios"):
                             metadata["api_calls"].append(name)
-                for key, value in node.items():
-                    if isinstance(value, dict):
-                        walk(value)
-                    elif isinstance(value, list):
+
+                # Recursively walk attributes
+                for key in dir(node):
+                    if key.startswith("_") or key in ("type", "loc", "range"):
+                        continue
+                    value = getattr(node, key)
+                    if isinstance(value, list):
                         for item in value:
-                            if isinstance(item, dict):
+                            if hasattr(item, "type"):
                                 walk(item)
+                    elif hasattr(value, "type"):
+                        walk(value)
 
             walk(ast)
 

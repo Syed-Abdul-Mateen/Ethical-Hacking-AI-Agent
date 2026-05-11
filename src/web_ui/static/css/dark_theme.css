@@ -90,6 +90,7 @@ header h1 {
     letter-spacing: -1px;
     margin-bottom: 0.5rem;
     background: linear-gradient(90deg, #ffffff, #a0a5b5);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }

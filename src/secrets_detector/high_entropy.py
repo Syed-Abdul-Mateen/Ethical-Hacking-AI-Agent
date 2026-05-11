@@ -40,7 +40,10 @@ class HighEntropyDetector:
         for match in string_pattern.finditer(content):
             s = match.group(1)
             # Filter out common non-secret strings (like URLs, file paths)
-            if s.startswith(('http://', 'https://', '/', 'C:')):
+            if s.startswith(('http://', 'https://', '/', 'C:', './', '../')):
+                continue
+            # Skip strings that are all whitespace or common prose
+            if s.isspace() or ' ' in s and len(s.split()) > 3:
                 continue
             if len(s) >= self.min_length:
                 entropy = self.shannon_entropy(s)
@@ -50,10 +53,14 @@ class HighEntropyDetector:
                         title="High Entropy String",
                         description=f"High entropy string (entropy {entropy:.2f}) found. May be a secret.",
                         file_path=file_path,
-                        line_number=line,
+                        line_start=line,
                         severity="medium",
                         cvss_score=5.0,
-                        remediation="If this is a secret, remove it from code. If it's a legitimate string, consider adding it to an ignore list.",
+                        remediation=(
+                            "If this is a secret, remove it from code and use environment variables "
+                            "or a secrets manager. If it is a legitimate string, consider adding "
+                            "it to an ignore list."
+                        ),
                         cwe_id="CWE-798",
                     )
                     findings.append(finding)

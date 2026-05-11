@@ -36,13 +36,24 @@ class Crawler:
             if response.status_code == 200:
                 self.pages.append(url)
                 soup = BeautifulSoup(response.text, "html.parser")
+                
+                # Discover links
                 for link in soup.find_all("a", href=True):
                     href = link["href"]
                     full_url = urljoin(url, href)
                     if self._is_internal(full_url):
                         self._crawl_page(full_url)
+                
+                # Discover form actions (crucial for dynamic testing)
+                for form in soup.find_all("form", action=True):
+                    action = form["action"]
+                    full_url = urljoin(url, action)
+                    if self._is_internal(full_url):
+                        self._crawl_page(full_url)
+        except requests.exceptions.RequestException as e:
+            logger.warning(f"Connection error while crawling {url}: {e}")
         except Exception as e:
-            logger.debug(f"Failed to crawl {url}: {e}")
+            logger.debug(f"Unexpected error crawling {url}: {e}")
 
     def _is_internal(self, url: str) -> bool:
         """Check if URL belongs to the same domain."""

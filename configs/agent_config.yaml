@@ -7,6 +7,8 @@ agent:
   temp_dir: "./data/temp"
   max_file_size_mb: 10
   follow_symlinks: false
+  max_workers: 4
+  ai_analysis_enabled: true
 
 # File system traversal
 walker:
@@ -56,6 +58,7 @@ detectors:
     - "injection.sql_injection"
     - "injection.command_injection"
     - "xss.reflected_xss"
+    - "rule_engine.RuleEngine"
     - "xss.stored_xss"
     - "xss.dom_xss"
     - "authentication.weak_passwords"
@@ -113,7 +116,7 @@ dynamic:
 # Reporting
 reporting:
   output_dir: "./reports"
-  formats: ["html", "json", "markdown"]   # html, pdf, json, markdown
+  formats: ["html", "json", "pdf", "sarif"]   # html, pdf, json, markdown, sarif
   templates_dir: "./src/reporting/templates"
   include_evidence: true
   executive_summary: true

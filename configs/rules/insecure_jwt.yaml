@@ -1,0 +1,10 @@
+id: insecure-jwt-config
+title: "Insecure JWT Configuration"
+description: "Detected JWT implementation without algorithm verification or using 'none' algorithm."
+severity: critical
+cwe: CWE-347
+languages: ["python", "javascript"]
+patterns:
+  - regex: "algorithm\\s*=\\s*['\"]none['\"]"
+  - regex: "jwt\\.decode\\(.*?verify=False.*?\\)"
+remediation: "Always enforce algorithm verification (e.g., algorithms=['HS256']) and never use 'none' algorithm in production."

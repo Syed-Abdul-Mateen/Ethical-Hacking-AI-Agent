@@ -1,0 +1,9 @@
+id: unsafe-shell-sink
+title: "Unsafe Shell Command Execution"
+description: "Found use of shell=True in subprocess calls which is a common source of Command Injection."
+severity: high
+cwe: CWE-78
+languages: ["python"]
+patterns:
+  - regex: "subprocess\\.(?:run|Popen|call|check_output)\\(.*?shell=True.*?\\)"
+remediation: "Avoid using shell=True. Pass arguments as a list to prevent command injection."

@@ -1,9 +1,11 @@
+from pathlib import Path
 """
 Detector for race condition vulnerabilities.
 """
 
 import re
-from typing import List
+from src.parsers.base_parser import ParsedFile
+from typing import List, Dict, Any, Optional
 
 from src.detectors.base_detector import BaseDetector, Finding
 from src.orchestrator.context import ScanContext
@@ -15,7 +17,7 @@ logger = get_logger(__name__)
 class RaceConditionDetector(BaseDetector):
     """Detects potential race conditions."""
 
-    def run(self, parsed_data: dict) -> list:
+    def run(self, parsed_data: Dict[Path, ParsedFile]) -> List[Finding]:
         findings = []
         for _, parsed_file in parsed_data.items():
             content = parsed_file.content

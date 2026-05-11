@@ -18,8 +18,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/yourusername/ethical_hacking_ai_agent",
-    packages=find_packages(where="src"),
-    package_dir={"": "src"},
+    packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Information Technology",
