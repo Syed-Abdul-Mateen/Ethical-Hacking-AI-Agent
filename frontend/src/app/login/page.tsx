@@ -89,7 +89,7 @@ export default function LoginPage() {
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500/50" />
                 <input
                   type="text"
-                  placeholder="Operator ID (admin)"
+                  placeholder="Operator ID"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="w-full bg-black/40 border border-white/10 pl-11 pr-4 py-3 rounded-xl outline-none focus:border-emerald-500/60 transition-all text-emerald-100 placeholder:text-white/20 text-sm font-mono"
@@ -102,7 +102,7 @@ export default function LoginPage() {
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500/50" />
                 <input
                   type="password"
-                  placeholder="Passcode (admin123)"
+                  placeholder="Passcode"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-black/40 border border-white/10 pl-11 pr-4 py-3 rounded-xl outline-none focus:border-emerald-500/60 transition-all text-emerald-100 placeholder:text-white/20 text-sm font-mono"
