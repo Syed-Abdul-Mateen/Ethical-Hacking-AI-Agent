@@ -78,35 +78,94 @@ class AsyncAgent:
             all_files = self.file_walker.walk(temp_dir)
             await self.emit_log(scan_id, f"Discovery complete. Found {len(all_files)} static resources.")
 
-            # Phase 2: Analysis
-            await self.emit_status(scan_id, "Analysis", 40, "Detecting forms and inputs...")
-            # (Simulation logic for now to show real-time progress)
-            await self.emit_log(scan_id, "Parsing HTML for forms and sensitive endpoints...")
-            await asyncio.sleep(2)
-            await self.emit_log(scan_id, "Found login form at /login.php", "SUCCESS")
+            # Phase 2: Analysis & Parsing
+            await self.emit_status(scan_id, "Analysis", 30, "Parsing files and extracting AST...")
+            await self.emit_log(scan_id, "Classifying files and extracting abstract syntax trees...")
             
-            # Phase 3: Vulnerability Testing (The core logic)
-            await self.emit_status(scan_id, "Vulnerability Testing", 60, "Launching active payload injections...")
-            payloads = ["' OR 1=1 --", "<script>alert(1)</script>", "../../../etc/passwd"]
-            for payload in payloads:
-                await self.emit_log(scan_id, f"Testing payload: {payload}")
-                await asyncio.sleep(1)
+            def parse_files():
+                parsed = {}
+                for f in all_files:
+                    parser = self.file_classifier.get_parser(f)
+                    if parser:
+                        try:
+                            res = parser.parse(f)
+                            if res: parsed[f] = res
+                        except: pass
+                return parsed
+                
+            parsed_data = await loop.run_in_executor(None, parse_files)
+            await self.emit_log(scan_id, f"Successfully parsed {len(parsed_data)} files.")
             
-            # Phase 4: Stress Testing (Controlled DoS)
-            await self.emit_status(scan_id, "Traffic Simulation", 80, "Simulating controlled load...")
-            await self.emit_log(scan_id, "Simulating concurrent request behavior (Safe Mode)...")
-            await asyncio.sleep(3)
+            # Phase 3: Vulnerability Testing (Core Logic)
+            await self.emit_status(scan_id, "Vulnerability Testing", 50, "Executing detector modules...")
             
-            # Phase 5: Finalizing
-            await self.emit_status(scan_id, "Reporting", 95, "Generating enterprise security report...")
-            await self.emit_log(scan_id, "Compiling findings and AI analysis...")
+            detectors_to_run = self.registry.get_enabled()
+            if not detectors_to_run:
+                context = ScanContext(target_path=temp_dir, config=self.config)
+                detectors_to_run = self.planner.plan(context)
+                
+            await self.emit_log(scan_id, f"Loaded {len(detectors_to_run)} active detector modules.")
             
-            # Update DB to completed
+            def run_detectors():
+                findings = []
+                context = ScanContext(target_path=temp_dir, config=self.config)
+                for cls in detectors_to_run:
+                    try:
+                        det = cls(self.config, context)
+                        findings.extend(det.run(parsed_data))
+                    except: pass
+                return findings
+                
+            all_findings = await loop.run_in_executor(None, run_detectors)
+            
+            # Phase 4: Intelligence & Deduplication
+            await self.emit_status(scan_id, "Intelligence", 80, "Correlating findings and calculating CVSS...")
+            unique_findings = self.deduplicator.deduplicate(all_findings)
+            
+            async with AsyncSessionLocal() as session:
+                for f in unique_findings:
+                    f.cvss_score = self.cvss_calculator.calculate(f)
+                    try:
+                        self.ai_analyzer.analyze_finding(f)
+                    except: pass
+                    
+                    # Store in Database
+                    db_finding = FindingModel(
+                        scan_id=scan_id,
+                        rule_id=f.rule_id,
+                        title=f.title,
+                        severity=f.severity,
+                        description=f.description,
+                        file_path=str(f.file_path),
+                        line_number=f.line_number,
+                        match=f.match_content if hasattr(f, 'match_content') else str(f.match),
+                        remediation=f.remediation
+                    )
+                    session.add(db_finding)
+                    await self.emit_log(scan_id, f"Found {f.severity} vulnerability: {f.title}", "ERROR" if f.severity.upper() in ["HIGH", "CRITICAL"] else "WARNING")
+                
+                await session.commit()
+            
+            # Phase 5: Reporting
+            await self.emit_status(scan_id, "Reporting", 95, "Generating enterprise security reports...")
+            
+            context = ScanContext(target_path=temp_dir, config=self.config, output_dir=Path('./data/scans') / scan_id)
+            context.findings = unique_findings
+            context.output_dir.mkdir(parents=True, exist_ok=True)
+            report_paths = self.report_generator.generate(context)
+            await self.emit_log(scan_id, f"Generated {len(report_paths)} reports in {context.output_dir}.")
+            
+            # Finalize ScanJob DB Record
             async with AsyncSessionLocal() as session:
                 scan = await session.get(ScanJob, scan_id)
                 if scan:
                     scan.status = "completed"
                     scan.progress = 100
+                    scan.total_findings = len(unique_findings)
+                    scan.critical_findings = sum(1 for f in unique_findings if f.severity.upper() == 'CRITICAL')
+                    scan.high_findings = sum(1 for f in unique_findings if f.severity.upper() == 'HIGH')
+                    scan.medium_findings = sum(1 for f in unique_findings if f.severity.upper() == 'MEDIUM')
+                    scan.low_findings = sum(1 for f in unique_findings if f.severity.upper() == 'LOW')
                     scan.completed_at = datetime.utcnow()
                     await session.commit()
             
