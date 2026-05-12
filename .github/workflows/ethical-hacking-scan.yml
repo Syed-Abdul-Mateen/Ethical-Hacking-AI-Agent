@@ -1,0 +1,41 @@
+name: Ethical Hacking AI Agent - SARIF Scan
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  schedule:
+    - cron: '0 0 * * 0' # Run weekly on Sundays
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    # In a real enterprise scenario, this action would build the target application
+    # and spin up the Ethical Hacking AI Agent via Docker Compose to scan the target.
+    # Below is a template for integrating the generated SARIF reports into GitHub Security.
+
+    - name: Run Ethical Hacking AI Agent Scan
+      id: run-scan
+      run: |
+        echo "Initializing DevSecOps AI Scanning Pipeline..."
+        # NOTE: Replace with your actual target URL or local Docker service
+        # docker-compose up -d
+        # curl -X POST "http://localhost:8000/scan/start?target_url=http://target"
+        
+        # Simulate generating a SARIF report for demonstration purposes
+        # cp ./reports/latest.sarif.json ./security-report.sarif
+
+    - name: Upload SARIF file to GitHub Advanced Security
+      # This step uploads the SARIF file so findings appear in the GitHub Security tab
+      # Requires GitHub Advanced Security to be enabled on private repos
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: ./reports/ # Directory or file containing the SARIF output
+        category: ethical-hacking-ai-agent

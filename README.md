@@ -34,27 +34,50 @@ The platform operates on a distributed, microservices-inspired architecture to e
 
 The framework supports multiple deployment strategies to accommodate varying infrastructural requirements.
 
-### Primary Deployment: Distributed Architecture (Recommended)
+### Primary Deployment: Docker Orchestration (Enterprise)
 
-This topology provisions the full stack, enabling the Next.js React dashboard and the FastAPI WebSocket backend for optimal performance and real-time visualization.
+The entire platform (Next.js Frontend, FastAPI Backend, and PostgreSQL Database) has been fully containerized. This is the recommended approach for production deployments on AWS, DigitalOcean, or Azure.
+
+**1. Configure the Environment**
+Create a `.env` file in the root directory:
+```env
+# Database Configuration
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/ai_hacker_db
+
+# Security & AI Configuration
+OPENAI_API_KEY=sk-your-openai-api-key
+SECRET_KEY=super_secret_enterprise_key_change_in_prod
+```
+
+**2. Deploy the Platform**
+Run the following command to build and launch all microservices securely:
+```bash
+docker-compose up --build -d
+```
+
+**3. Authenticate**
+Access Mission Control via `http://localhost:3000`. The platform is secured by JWT Authentication. Use the default operator credentials:
+* **Operator ID:** `admin`
+* **Passcode:** `admin123`
+
+### Secondary Deployment: Local Distributed Architecture
+
+If you prefer to run the applications locally without Docker:
 
 **1. Provision the Control Plane (Backend)**
-Ensure Python 3.10+ is installed. Navigate to the project root to install dependencies and initialize the asynchronous server:
+Ensure Python 3.10+ is installed. Ensure your local `.env` points to a local PostgreSQL instance.
 ```bash
 pip install -r requirements.txt
 python -m uvicorn backend.main:socket_app --reload --port 8000
 ```
 
 **2. Provision Mission Control (Frontend)**
-Ensure Node.js 18.0+ is installed. Open a discrete terminal instance, navigate to the frontend directory, and initialize the client interface:
+Ensure Node.js 18.0+ is installed.
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-
-**3. System Verification**
-Access the Mission Control interface via `http://localhost:3000` to verify telemetry connection and operational readiness.
 
 ### Fallback Deployment: Standalone Architecture
 
