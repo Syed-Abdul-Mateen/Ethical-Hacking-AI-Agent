@@ -9,6 +9,12 @@ agent:
   follow_symlinks: false
   max_workers: 4
   ai_analysis_enabled: true
+  ai:
+    provider: "openai"
+    model: "gpt-4o-mini"
+    # Provide the key here or via OPENAI_API_KEY environment variable
+    api_key: ""
+
 
 # File system traversal
 walker:
