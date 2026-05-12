@@ -48,3 +48,5 @@ pytest-mock>=3.11.1
 
 # Utilities
 watchdog>=3.0.0
+asyncpg==0.31.0
+psycopg2-binary==2.9.9

@@ -43,8 +43,13 @@ class FindingModel(Base):
     
     scan: Mapped["ScanJob"] = relationship(back_populates="findings")
 
-# SQLite for local dev
-engine = create_async_engine("sqlite+aiosqlite:///backend/database/ai_hacker.db", echo=False)
+import os
+
+# Dynamic Database Configuration
+# Fallback to local SQLite if no DATABASE_URL is provided in .env
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite+aiosqlite:///backend/database/ai_hacker.db")
+
+engine = create_async_engine(DATABASE_URL, echo=False)
 AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
 async def init_db():
