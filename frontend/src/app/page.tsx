@@ -3,15 +3,25 @@
 import { useState, useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import {
   Shield, Target, Activity, AlertTriangle,
   FileText, Zap, Clock, CheckCircle, XCircle,
-  Download, ChevronDown, ChevronUp, Globe
+  Download, ChevronDown, ChevronUp, Globe, LogOut
 } from "lucide-react";
 import LiveTerminal from "@/components/LiveTerminal";
 import { cn } from "@/lib/utils";
 
 const API_BASE = "http://localhost:8000";
+
+// Configure Axios Interceptor for JWT
+axios.interceptors.request.use((config) => {
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 interface Finding {
   id: number;
@@ -52,11 +62,25 @@ export default function Dashboard() {
   const [expandedFinding, setExpandedFinding] = useState<number | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const scanIdRef = useRef<string | null>(null);
+  const router = useRouter();
 
-  // Load scan history on mount
+  // Authentication & History Load
   useEffect(() => {
-    axios.get(`${API_BASE}/scans/history`).then(r => setHistory(r.data)).catch(() => {});
-  }, []);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
+    axios.get(`${API_BASE}/scans/history`)
+      .then(r => setHistory(r.data))
+      .catch((err) => {
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          router.push("/login");
+        }
+      });
+  }, [router]);
 
   // WebSocket connection
   useEffect(() => {
@@ -111,8 +135,13 @@ export default function Dashboard() {
       scanIdRef.current = newScanId;
     } catch (err) {
       console.error(err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem("token");
+        router.push("/login");
+        return;
+      }
       setIsScanning(false);
-      setStatus({ phase: "Failed", progress: 0, message: "Backend unreachable. Is the server running?" });
+      setStatus({ phase: "Failed", progress: 0, message: "Backend unreachable or unauthorized." });
     }
   };
 
@@ -168,9 +197,18 @@ export default function Dashboard() {
                 <Shield className="w-10 h-10 text-emerald-500 shrink-0" />
                 ETHICAL HACKING AI AGENT
               </h1>
-              <p className="text-white/40 text-sm mt-1 font-medium tracking-widest uppercase">
-                Autonomous Security Operation Center v2.0
-              </p>
+              <div className="flex items-center gap-4 mt-1">
+                <p className="text-white/40 text-sm font-medium tracking-widest uppercase">
+                  Autonomous Security Operation Center v2.0
+                </p>
+                <button 
+                  onClick={() => { localStorage.removeItem("token"); router.push("/login"); }}
+                  className="text-xs flex items-center gap-1 text-red-400/70 hover:text-red-400 transition-colors"
+                >
+                  <LogOut className="w-3 h-3" />
+                  DISCONNECT
+                </button>
+              </div>
             </div>
 
             {/* Target Input */}

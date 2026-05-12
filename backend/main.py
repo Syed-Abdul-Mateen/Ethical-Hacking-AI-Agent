@@ -8,12 +8,52 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pathlib import Path
 import socketio
-from backend.database.models import init_db, AsyncSessionLocal, ScanJob, FindingModel
+from backend.database.models import init_db, AsyncSessionLocal, ScanJob, FindingModel, UserModel
 from backend.engine.agent import AsyncAgent
 from src.utils.logger import get_logger
 from sqlalchemy import select
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import Depends, status
+import jwt
+from datetime import timedelta
+from passlib.context import CryptContext
 
 logger = get_logger(__name__)
+
+# ─── Authentication Setup ───────────────────────────────────────────────────
+SECRET_KEY = os.environ.get("SECRET_KEY", "super_secret_enterprise_key_change_in_prod")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 24 hours
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (expires_delta if expires_delta else timedelta(minutes=15))
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except jwt.PyJWTError:
+        raise credentials_exception
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(UserModel).where(UserModel.username == username))
+        user = result.scalar_one_or_none()
+        if user is None:
+            raise credentials_exception
+        return user
+
 
 # Initialize FastAPI
 app = FastAPI(title="Ethical Hacking AI Agent - API v2.0")
@@ -48,10 +88,26 @@ async def connect(sid, environ):
 async def disconnect(sid):
     logger.info(f"WebSocket client disconnected: {sid}")
 
+# ─── Authentication Routes ──────────────────────────────────────────────────
+
+@app.post("/login")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(UserModel).where(UserModel.username == form_data.username))
+        user = result.scalar_one_or_none()
+        if not user or not pwd_context.verify(form_data.password, user.hashed_password):
+            raise HTTPException(status_code=400, detail="Incorrect username or password")
+        
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": user.username}, expires_delta=access_token_expires
+        )
+        return {"access_token": access_token, "token_type": "bearer"}
+
 # ─── Scan Routes ────────────────────────────────────────────────────────────
 
 @app.post("/scan/start")
-async def start_scan(target_url: str, background_tasks: BackgroundTasks):
+async def start_scan(target_url: str, background_tasks: BackgroundTasks, current_user: UserModel = Depends(get_current_user)):
     """Start a new async security scan."""
     scan_id = str(uuid.uuid4())
 
@@ -72,7 +128,7 @@ async def start_scan(target_url: str, background_tasks: BackgroundTasks):
     return {"scan_id": scan_id, "status": "started", "message": "Scan initiated successfully."}
 
 @app.get("/scan/{scan_id}")
-async def get_scan_status(scan_id: str):
+async def get_scan_status(scan_id: str, current_user: UserModel = Depends(get_current_user)):
     """Get full status and findings for a scan."""
     async with AsyncSessionLocal() as session:
         scan = await session.get(ScanJob, scan_id)
@@ -113,7 +169,7 @@ async def get_scan_status(scan_id: str):
         }
 
 @app.get("/scans/history")
-async def get_scan_history():
+async def get_scan_history(current_user: UserModel = Depends(get_current_user)):
     """Get all past scans for the history panel."""
     async with AsyncSessionLocal() as session:
         result = await session.execute(
@@ -133,7 +189,7 @@ async def get_scan_history():
         ]
 
 @app.get("/scan/{scan_id}/report/pdf")
-async def download_pdf_report(scan_id: str):
+async def download_pdf_report(scan_id: str, current_user: UserModel = Depends(get_current_user)):
     """Download the PDF security report for a scan."""
     # Reports are saved under data/scans/<scan_id>/
     report_path = Path(f"./data/scans/{scan_id}/report.pdf")
@@ -149,7 +205,7 @@ async def download_pdf_report(scan_id: str):
     )
 
 @app.get("/scan/{scan_id}/report/sarif")
-async def download_sarif_report(scan_id: str):
+async def download_sarif_report(scan_id: str, current_user: UserModel = Depends(get_current_user)):
     """Download the SARIF report for CI/CD integration."""
     report_path = Path(f"./data/scans/{scan_id}/report.sarif.json")
     if not report_path.exists():

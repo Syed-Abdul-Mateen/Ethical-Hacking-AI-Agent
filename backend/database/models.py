@@ -43,6 +43,14 @@ class FindingModel(Base):
     
     scan: Mapped["ScanJob"] = relationship(back_populates="findings")
 
+class UserModel(Base):
+    __tablename__ = "users"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(String, unique=True, index=True)
+    hashed_password: Mapped[str] = mapped_column(String)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
 import os
 
 # Dynamic Database Configuration
@@ -55,3 +63,19 @@ AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        
+    # Create default admin user
+    from passlib.context import CryptContext
+    from sqlalchemy.future import select
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(UserModel).where(UserModel.username == "admin"))
+        user = result.scalar_one_or_none()
+        if not user:
+            admin = UserModel(
+                username="admin",
+                hashed_password=pwd_context.hash("admin123")
+            )
+            session.add(admin)
+            await session.commit()
