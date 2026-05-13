@@ -76,6 +76,10 @@ class AsyncAgent:
             await loop.run_in_executor(None, download_website, target_url, temp_dir)
             
             all_files = self.file_walker.walk(temp_dir)
+            
+            if not all_files:
+                raise Exception("Website is not reachable or no resources could be downloaded. Please verify the URL.")
+                
             await self.emit_log(scan_id, f"Discovery complete. Found {len(all_files)} static resources.")
 
             # Phase 2: Analysis & Parsing
